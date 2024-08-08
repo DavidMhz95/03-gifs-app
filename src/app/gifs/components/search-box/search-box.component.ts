@@ -1,4 +1,4 @@
-import { GifsServiceService } from './../../services/gifs.service.service';
+import { GifsService } from './../../services/gifs.service.service';
 import { Component, ElementRef,  ViewChild } from '@angular/core';
 
 @Component({
@@ -20,7 +20,7 @@ export class SearchBoxComponent {
   public tagInput! : ElementRef<HTMLInputElement>
 
 
-  constructor(private gifService : GifsServiceService){}
+  constructor(private gifService : GifsService){}
 
   //searchTag(newTag: string){
   searchTag(){

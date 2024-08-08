@@ -1,16 +1,24 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { SearchResponse, Meta, Gif } from '../interfaces/gifs.interfaces';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class GifsServiceService {
+export class GifsService {
+
+  public gifList : Gif[] = []
 
   private _tagHistory : string[] = []
   private api_key: string = 'KyWFqK9l4XB16x4yR6b35vmsiV07W4od'
   private serviceUrl: string = 'https://api.giphy.com/v1/gifs'
-  constructor( private http: HttpClient) { }
+  constructor( private http: HttpClient) {
+    this.loadLocalStorage()
+    if(this._tagHistory.length >0){
+      this.searchTag(this.tagsHistory[0])
+    }
+  }
 
   get tagsHistory(){
     return [...this._tagHistory]
@@ -27,11 +35,25 @@ export class GifsServiceService {
     .set('q', tag)
 
 
-    this.http.get(`${this.serviceUrl}/search`, {params})
-    .subscribe( resp => console.log(resp))
+    this.http.get<SearchResponse>(`${this.serviceUrl}/search`, {params})
+    .subscribe( resp =>
+      {
+        this.gifList = resp.data
+        // console.log({gifs: this.gifList})
+      }
+  )
 
   }
 
+  private saveLocalStorage():void{
+    localStorage.setItem('history', JSON.stringify(this._tagHistory))
+  }
+
+  private loadLocalStorage():void{
+    if(!localStorage.getItem('history')) return;
+
+    this._tagHistory = JSON.parse(localStorage.getItem('history')! )
+  }
   private organizeHistory(tag: string) {
     tag = tag.toLowerCase()
     if(this._tagHistory.includes(tag)){
@@ -39,6 +61,7 @@ export class GifsServiceService {
     }
     this._tagHistory.unshift(tag)
     this._tagHistory = this._tagHistory.splice(0,10)
+    this.saveLocalStorage()
   }
 
 }
